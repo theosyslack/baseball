@@ -81,7 +81,7 @@ impl Player {
     }
 
     pub fn number(&self) -> usize {
-        self.number.clone()
+        self.number
     }
 
     pub fn set_position(&self, position: Option<PlayerPosition>) -> Self {

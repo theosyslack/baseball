@@ -47,14 +47,14 @@ fn main() {
                 ReadCommand::Player { filename } => {
                     let string = fs::read_to_string(filename).expect("Could not find file");
                     let value: Player = serde_json::from_str(&string)
-                        .expect(&format!("{filename} is not a valid Player."));
+                        .unwrap_or_else(|_| panic!("{filename} is not a valid Team."));
 
                     println!("{:?}", &value);
                 }
                 ReadCommand::Team { filename } => {
                     let string = fs::read_to_string(filename).expect("Could not find file");
                     let value: Team = serde_json::from_str(&string)
-                        .expect(&format!("{filename} is not a valid Team."));
+                        .unwrap_or_else(|_| panic!("{filename} is not a valid Player."));
 
                     println!("{}", value);
                 }

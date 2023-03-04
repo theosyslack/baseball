@@ -89,7 +89,7 @@ impl Team {
             .iter()
             .map(|position| {
                 self.find_player_by_position(position)
-                    .expect(&format!("No {} found", position))
+                    .unwrap_or_else(|| panic!("No {} found", position))
             })
             .collect();
 
@@ -117,7 +117,7 @@ impl Team {
     pub fn fake() -> Self {
         let team: Team = Faker.fake();
 
-        let mut original_roster = team.roster();
+        let original_roster = team.roster();
         let dh = original_roster
             .get(0)
             .unwrap()
@@ -162,7 +162,7 @@ impl Team {
         let assigned_players = [dh, c, b1, b2, ss, b3, rf, cf, lf];
 
         let updated_roster: Vec<Player> =
-            [assigned_players.to_vec(), original_roster.to_vec()].concat();
+            [[p].to_vec(), assigned_players.to_vec(), original_roster.to_vec()].concat();
         let lineup = assigned_players.map(|p| p.id);
 
         Self {
@@ -219,6 +219,6 @@ impl Display for Team {
             );
         }
 
-        write!(f, "{}", string.to_string())
+        write!(f, "{}", string)
     }
 }
