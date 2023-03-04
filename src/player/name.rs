@@ -1,4 +1,7 @@
-use fake::{Fake, Dummy, faker::{name::en::FirstName, name::en::LastName}};
+use fake::{
+    faker::{name::en::FirstName, name::en::LastName},
+    Dummy, Fake,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, Dummy, Deserialize, Serialize)]
@@ -13,7 +16,7 @@ impl PlayerName {
     pub fn new(first: &str, last: &str) -> Self {
         Self {
             first: first.to_string(),
-            last: last.to_string()
+            last: last.to_string(),
         }
     }
 

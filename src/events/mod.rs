@@ -3,16 +3,11 @@ mod kind;
 use self::kind::EventKind;
 
 pub struct Event {
-    kind: EventKind
+    kind: EventKind,
 }
 
 impl Event {
-    fn new (kind: EventKind) -> Self {
-        Event {
-            kind
-        }
+    fn new(kind: EventKind) -> Self {
+        Event { kind }
     }
 }
-
-
-

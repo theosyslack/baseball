@@ -6,18 +6,21 @@ mod player;
 mod team;
 
 use args::{Cli, Command, GenCommand, ReadCommand};
-use clap::{Parser};
+use clap::Parser;
 use player::Player;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use std::fs::{self, File};
+use std::io::{self, prelude::*};
 use team::Team;
-use std::fs::{File, self};
-use std::io::{prelude::*, self};
 
 fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Command::Gen { commands, should_save_file } => {
+        Command::Gen {
+            commands,
+            should_save_file,
+        } => {
             match commands {
                 GenCommand::Player => {
                     let player = Player::fake();
@@ -27,7 +30,7 @@ fn main() {
                     } else {
                         println!("{}", print(&player));
                     }
-                },
+                }
                 GenCommand::Team => {
                     let team = Team::fake();
 
@@ -38,38 +41,37 @@ fn main() {
                     }
                 }
             };
-
         }
         Command::Read { commands } => {
-
             match commands {
                 ReadCommand::Player { filename } => {
                     let string = fs::read_to_string(filename).expect("Could not find file");
-                    let value: Player = serde_json::from_str(&string).expect(&format!("{filename} is not a valid Player."));
+                    let value: Player = serde_json::from_str(&string)
+                        .expect(&format!("{filename} is not a valid Player."));
 
                     println!("{:?}", &value);
-                },
+                }
                 ReadCommand::Team { filename } => {
                     let string = fs::read_to_string(filename).expect("Could not find file");
-                    let value: Team = serde_json::from_str(&string).expect(&format!("{filename} is not a valid Team."));
+                    let value: Team = serde_json::from_str(&string)
+                        .expect(&format!("{filename} is not a valid Team."));
 
                     println!("{}", value);
-                },
+                }
             }
             // let string = read_json_file(filename);
-        },
+        }
     }
 }
 
-
-fn write_json_file<T: Serialize> (filename: &str, value: &T) {
+fn write_json_file<T: Serialize>(filename: &str, value: &T) {
     let mut file = File::create(format!("{}.json", filename)).expect("could not create file");
     let content = print(value);
 
     file.write_all(content.as_bytes()).expect("could not write")
 }
 
-fn print<T: Serialize> (value: &T) -> String {
+fn print<T: Serialize>(value: &T) -> String {
     serde_json::to_string_pretty(value).expect("could not stringify")
 }
 
@@ -77,7 +79,7 @@ fn print<T: Serialize> (value: &T) -> String {
 //     fs::read_to_string(&format!("{}.json", filename))
 
 //     // let value = serde_json::from_str(&content);
-    
+
 //     // if let Ok(value) =  value {
 //     //     Ok(value)
 //     // } else {

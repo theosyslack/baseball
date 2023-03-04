@@ -14,9 +14,8 @@ pub enum PlayerPosition {
     ThirdBase,
     RightField,
     CenterField,
-    LeftField
+    LeftField,
 }
-
 
 impl Display for PlayerPosition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

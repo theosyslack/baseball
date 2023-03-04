@@ -1,13 +1,13 @@
 use std::fmt::Display;
 
 use crate::player::{position::PlayerPosition, Player};
+use fake::uuid::UUIDv1;
 use fake::{
     faker::{address::en::CityName, company::en::BsNoun, company::en::CompanyName},
     Dummy, Fake, Faker,
 };
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use fake::uuid::UUIDv1;
 
 #[derive(Clone, Default, Debug, Dummy, Deserialize, Serialize)]
 pub struct Team {
@@ -40,19 +40,19 @@ impl Team {
         team
     }
 
-    fn gen_id () -> Uuid {
-        let id_seed: [u8;6] = [
+    fn gen_id() -> Uuid {
+        let id_seed: [u8; 6] = [
             rand::random::<u8>(),
             rand::random::<u8>(),
             rand::random::<u8>(),
             rand::random::<u8>(),
             rand::random::<u8>(),
-            rand::random::<u8>()
+            rand::random::<u8>(),
         ];
 
         Uuid::now_v1(&id_seed)
     }
-    
+
     pub fn name(&self) -> String {
         self.name.clone()
     }
@@ -60,7 +60,6 @@ impl Team {
     pub fn roster(&self) -> Vec<Player> {
         self.roster.clone()
     }
-
 
     pub fn find_player_by_position(&self, position: &PlayerPosition) -> Option<Player> {
         self.roster
@@ -70,10 +69,7 @@ impl Team {
     }
 
     pub fn find_player_by_id(&self, id: &str) -> Option<Player> {
-        self.roster
-            .iter()
-            .find(|p| p.id == id)
-            .cloned()
+        self.roster.iter().find(|p| p.id == id).cloned()
     }
 
     fn init_lineup(&mut self) {
@@ -92,7 +88,8 @@ impl Team {
         let lineup: Vec<Player> = position_order
             .iter()
             .map(|position| {
-                self.find_player_by_position(position).expect(&format!("No {} found", position))
+                self.find_player_by_position(position)
+                    .expect(&format!("No {} found", position))
             })
             .collect();
 
@@ -105,36 +102,67 @@ impl Team {
             lineup[5].clone(),
             lineup[6].clone(),
             lineup[7].clone(),
-            lineup[8].clone()
+            lineup[8].clone(),
         ]);
     }
 
     pub fn set_lineup(&self, lineup: [Player; 9]) -> Self {
         let self_copy = self.clone();
         Self {
-            lineup: lineup.map(|p| p.id) ,
+            lineup: lineup.map(|p| p.id),
             ..self_copy
         }
     }
 
     pub fn fake() -> Self {
         let team: Team = Faker.fake();
-        
+
         let mut original_roster = team.roster();
-        let dh = original_roster.get(0).unwrap().set_position(Some(PlayerPosition::DesignatedHitter));
-        let p = original_roster.get(1).unwrap().set_position(Some(PlayerPosition::Pitcher));
-        let c = original_roster.get(2).unwrap().set_position(Some(PlayerPosition::Catcher));
-        let b1 = original_roster.get(3).unwrap().set_position(Some(PlayerPosition::FirstBase));
-        let b2 = original_roster.get(4).unwrap().set_position(Some(PlayerPosition::SecondBase));
-        let ss = original_roster.get(5).unwrap().set_position(Some(PlayerPosition::Shortstop));
-        let b3 = original_roster.get(6).unwrap().set_position(Some(PlayerPosition::ThirdBase));
-        let rf = original_roster.get(7).unwrap().set_position(Some(PlayerPosition::RightField));
-        let cf = original_roster.get(8).unwrap().set_position(Some(PlayerPosition::CenterField));
-        let lf = original_roster.get(9).unwrap().set_position(Some(PlayerPosition::LeftField));
+        let dh = original_roster
+            .get(0)
+            .unwrap()
+            .set_position(Some(PlayerPosition::DesignatedHitter));
+        let p = original_roster
+            .get(1)
+            .unwrap()
+            .set_position(Some(PlayerPosition::Pitcher));
+        let c = original_roster
+            .get(2)
+            .unwrap()
+            .set_position(Some(PlayerPosition::Catcher));
+        let b1 = original_roster
+            .get(3)
+            .unwrap()
+            .set_position(Some(PlayerPosition::FirstBase));
+        let b2 = original_roster
+            .get(4)
+            .unwrap()
+            .set_position(Some(PlayerPosition::SecondBase));
+        let ss = original_roster
+            .get(5)
+            .unwrap()
+            .set_position(Some(PlayerPosition::Shortstop));
+        let b3 = original_roster
+            .get(6)
+            .unwrap()
+            .set_position(Some(PlayerPosition::ThirdBase));
+        let rf = original_roster
+            .get(7)
+            .unwrap()
+            .set_position(Some(PlayerPosition::RightField));
+        let cf = original_roster
+            .get(8)
+            .unwrap()
+            .set_position(Some(PlayerPosition::CenterField));
+        let lf = original_roster
+            .get(9)
+            .unwrap()
+            .set_position(Some(PlayerPosition::LeftField));
 
         let assigned_players = [dh, c, b1, b2, ss, b3, rf, cf, lf];
-        
-        let updated_roster: Vec<Player> = [assigned_players.to_vec(), original_roster.to_vec()].concat();
+
+        let updated_roster: Vec<Player> =
+            [assigned_players.to_vec(), original_roster.to_vec()].concat();
         let lineup = assigned_players.map(|p| p.id);
 
         Self {
@@ -168,7 +196,6 @@ impl Team {
     }
 }
 
-
 impl Display for Team {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut string = String::new();
@@ -180,7 +207,16 @@ impl Display for Team {
         line(&mut string, "---");
 
         for player in &self.roster {
-            line(&mut string, &format!("  - {} ({})", player.name.full(), player.position().map_or("Benched".to_string(), |pos| pos.code())));
+            line(
+                &mut string,
+                &format!(
+                    "  - {} ({})",
+                    player.name.full(),
+                    player
+                        .position()
+                        .map_or("Benched".to_string(), |pos| pos.code())
+                ),
+            );
         }
 
         write!(f, "{}", string.to_string())

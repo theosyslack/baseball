@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 pub enum PlayerHandedness {
     Left,
     Right,
-    Ambidextrous
+    Ambidextrous,
 }
 
 impl Default for PlayerHandedness {

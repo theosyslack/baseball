@@ -10,14 +10,14 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new (home: Team, away: Team) -> Self {
+    pub fn new(home: Team, away: Team) -> Self {
         Self {
             teams: [home, away],
             ..Default::default()
         }
     }
 
-    pub fn teams (&self) -> [Team; 2] {
+    pub fn teams(&self) -> [Team; 2] {
         self.teams.clone()
     }
 
