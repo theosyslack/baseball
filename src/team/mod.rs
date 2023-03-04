@@ -20,7 +20,7 @@ pub struct Team {
     stadium: String,
     #[dummy(faker = "CityName()")]
     city: String,
-    #[dummy(faker = "(Faker, 9..20)")]
+    #[dummy(faker = "(Faker, 26)")]
     roster: Vec<Player>,
     lineup: [String; 9],
 }
@@ -42,12 +42,12 @@ impl Team {
 
     fn gen_id () -> Uuid {
         let id_seed: [u8;6] = [
-            24,
-            24,
-            24,
-            24,
-            24,
-            24
+            rand::random::<u8>(),
+            rand::random::<u8>(),
+            rand::random::<u8>(),
+            rand::random::<u8>(),
+            rand::random::<u8>(),
+            rand::random::<u8>()
         ];
 
         Uuid::now_v1(&id_seed)
@@ -120,21 +120,27 @@ impl Team {
     pub fn fake() -> Self {
         let team: Team = Faker.fake();
         
-        let p = team.roster[0].set_position(Some(PlayerPosition::Pitcher));
-        let c = team.roster[1].set_position(Some(PlayerPosition::Catcher));
-        let b1 = team.roster[2].set_position(Some(PlayerPosition::FirstBase));
-        let b2 = team.roster[3].set_position(Some(PlayerPosition::SecondBase));
-        let ss = team.roster[4].set_position(Some(PlayerPosition::Shortstop));
-        let b3 = team.roster[5].set_position(Some(PlayerPosition::ThirdBase));
-        let rf = team.roster[6].set_position(Some(PlayerPosition::RightField));
-        let cf = team.roster[7].set_position(Some(PlayerPosition::CenterField));
-        let lf = team.roster[8].set_position(Some(PlayerPosition::LeftField));
+        let mut original_roster = team.roster();
+        let dh = original_roster.get(0).unwrap().set_position(Some(PlayerPosition::DesignatedHitter));
+        let p = original_roster.get(1).unwrap().set_position(Some(PlayerPosition::Pitcher));
+        let c = original_roster.get(2).unwrap().set_position(Some(PlayerPosition::Catcher));
+        let b1 = original_roster.get(3).unwrap().set_position(Some(PlayerPosition::FirstBase));
+        let b2 = original_roster.get(4).unwrap().set_position(Some(PlayerPosition::SecondBase));
+        let ss = original_roster.get(5).unwrap().set_position(Some(PlayerPosition::Shortstop));
+        let b3 = original_roster.get(6).unwrap().set_position(Some(PlayerPosition::ThirdBase));
+        let rf = original_roster.get(7).unwrap().set_position(Some(PlayerPosition::RightField));
+        let cf = original_roster.get(8).unwrap().set_position(Some(PlayerPosition::CenterField));
+        let lf = original_roster.get(9).unwrap().set_position(Some(PlayerPosition::LeftField));
 
-        let lineup = [p, c, b1, b2, ss, b3, rf, cf, lf].map(|p| p.id);
+        let assigned_players = [dh, c, b1, b2, ss, b3, rf, cf, lf];
+        
+        let updated_roster: Vec<Player> = [assigned_players.to_vec(), original_roster.to_vec()].concat();
+        let lineup = assigned_players.map(|p| p.id);
 
         Self {
             id: Self::gen_id().to_string(),
             lineup,
+            roster: updated_roster,
             ..team
         }
     }
